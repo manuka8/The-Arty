@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,9 +8,10 @@ import {
   StyleSheet,
   FlatList,
   Dimensions,
+  TextInput
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-
+import AntDesign from '@expo/vector-icons/AntDesign';
 const { width } = Dimensions.get('window');
 
 const ARTWORK_DATA = [
@@ -93,26 +94,51 @@ const HomeScreen = ({ navigation }) => {
       <Text style={styles.categoryText}>{item.name}</Text>
     </TouchableOpacity>
   );
-
+  const [showSearch, setShowSearch] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   return (
     <ScrollView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>ArtiFy</Text>
-        <View style={styles.headerIcons}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="search-outline" size={24} color="#000" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="notifications-outline" size={24} color="#000" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-            <Ionicons name="cart-outline" size={24} color="#000" />
-          </TouchableOpacity>
-        </View>
+        {showSearch ? (
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search artworks, artists..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              autoFocus={true}
+            />
+            <TouchableOpacity 
+              style={styles.searchCloseButton}
+              onPress={() => setShowSearch(false)}
+            >
+              <Ionicons name="close" size={24} color="#000" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <>
+            <Text style={styles.headerTitle}>ArtiFy</Text>
+            <View style={styles.headerIcons}>
+              <TouchableOpacity 
+                style={styles.iconButton}
+                onPress={() => setShowSearch(true)}
+              >
+                <Ionicons name="search-outline" size={24} color="#000" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.iconButton}>
+                <Ionicons name="notifications-outline" size={24} color="#000" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.iconButton}>
+                <Ionicons name="cart-outline" size={24} color="#000" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.iconButton}>
+                <AntDesign name="user" size={24} color="black" /> 
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
       </View>
 
-      {/* Hero Banner */}
       <TouchableOpacity style={styles.heroBanner}>
         <Image
           source={require('../assets/hero-banner.jpg')}
@@ -124,7 +150,7 @@ const HomeScreen = ({ navigation }) => {
         </View>
       </TouchableOpacity>
 
-      {/* Categories */}
+
       <Text style={styles.sectionTitle}>Categories</Text>
       <FlatList
         data={CATEGORIES}
@@ -135,7 +161,7 @@ const HomeScreen = ({ navigation }) => {
         contentContainerStyle={styles.categoriesList}
       />
 
-      {/* Featured Artworks */}
+
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>Featured Artworks</Text>
         <TouchableOpacity>
