@@ -25,16 +25,24 @@ public class User {
 
     @Column(nullable = false)
     private String password;
-
+    
+    @Column(nullable=true)
+    private String profile_pic;
+    
+    @Column
+    private  boolean verify;
     // Constructors
     public User() {}
 
-    public User(String username, String email, String firstName, String lastName, String password) {
+    public User(String username, String email, String firstName, String lastName, String password,String profile_pic,boolean verify) {
         this.username = username;
         this.email = email;
         this.firstName = firstName;
         this.lastName = lastName;
         this.password = password;
+        this.profile_pic=profile_pic;
+        this.verify = false;
+
     }
 
     // Getters and Setters
@@ -86,4 +94,21 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
+	public String getProfile_pic() {
+		return profile_pic;
+	}
+
+	public void setProfile_pic(String profile_pic) {
+		this.profile_pic = profile_pic;
+	}
+
+	public boolean isVerify() {
+		return verify;
+	}
+
+	public void setVerify(boolean verify) {
+		this.verify = verify;
+	}
+    
 }
