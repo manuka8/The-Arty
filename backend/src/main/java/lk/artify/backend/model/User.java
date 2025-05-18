@@ -1,6 +1,10 @@
 package lk.artify.backend.model;
 
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -12,7 +16,7 @@ public class User {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String username;
+    private String username; 
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -33,6 +37,9 @@ public class User {
     private  boolean verify;
     // Constructors
     public User() {}
+    
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Bid> bids;
 
     public User(String username, String email, String firstName, String lastName, String password,String profile_pic,boolean verify) {
         this.username = username;
@@ -110,5 +117,22 @@ public class User {
 	public void setVerify(boolean verify) {
 		this.verify = verify;
 	}
+	
+	@ManyToMany
+    @JoinTable(
+        name = "user_following_sellers",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "seller_id")
+    )
+    private Set<Seller> followedSellers = new HashSet<>();
+
+    // Getter & Setter for followedSellers
+    public Set<Seller> getFollowedSellers() {
+        return followedSellers;
+    }
+
+    public void setFollowedSellers(Set<Seller> followedSellers) {
+        this.followedSellers = followedSellers;
+    }
     
 }
