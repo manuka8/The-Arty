@@ -20,10 +20,10 @@ public class Seller {
     private User user;
 
     @Column(nullable = false)
-    private String type; // "single" or "organization"
+    private String type; 
 
     @Column(nullable = false)
-    private String businessName; // Artist name or Business name
+    private String businessName; 
 
     @Column(nullable = false)
     private String businessEmail;
@@ -38,10 +38,10 @@ public class Seller {
     private String businessRegNo;
 
     @Column
-    private String location; // Optional field
+    private String location; 
 
     @Column(nullable = false)
-    private int rate; // 1 to 10
+    private int rate; 
 
     @Column(nullable = false)
     private boolean verified = false;
