@@ -61,7 +61,12 @@ public class ArtWork {
     @ManyToOne
     @JoinColumn(name = "auction_id")
     private Auction auction;
-    
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal minimumBid;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal currentBid;
 
 
     public enum ArtCopyType {
