@@ -3,6 +3,14 @@ import { NavigationContainer } from '@react-navigation/native';
 
 // Import your screens
 import HomeScreen from '../screens/HomeScreen';
+import LoginScreen from '../screens/LoginScreen';
+import RegisterScreen from '../screens/RegisterScreen';
+import ProfileScreen from '../screens/ProfileScreen';
+import VerifyEmailScreen from '../screens/VerifyEmail';
+import SellerRegistrationScreen from '../screens/SellerRegistrationScreen';
+import ArtistDashboard from '../screens/ArtistDashboard';
+import AddArtwork from '../screens/AddArtwork';
+import AddAuction from '../screens/AddAuction';
 /*import ArtDetailScreen from '../screens/ArtDetailScreen';
 import AuctionScreen from '../screens/AuctionScreen';
 import ArtistProfileScreen from '../screens/ArtistProfileScreen';
@@ -21,6 +29,46 @@ const AppNavigator = () => {
         <Stack.Screen 
           name="Home" 
           component={HomeScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="Register" 
+          component={RegisterScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="Profile" 
+          component={ProfileScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="VerifyEmail" 
+          component={VerifyEmailScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="SellerRegister" 
+          component={SellerRegistrationScreen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="ArtistDashboard" 
+          component={ArtistDashboard} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="AddArtwork" 
+          component={AddArtwork} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="AddAuction" 
+          component={AddAuction} 
           options={{ headerShown: false }} 
         />
         {/* <Stack.Screen 
