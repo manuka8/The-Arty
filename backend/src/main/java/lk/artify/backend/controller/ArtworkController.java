@@ -8,6 +8,7 @@ import lk.artify.backend.repository.ArtWorkRepository;
 import lk.artify.backend.repository.SellerRepository;
 import lk.artify.backend.service.ArtWorkImageService;
 import lk.artify.backend.dto.ArtworkBasicInfoDTO;
+import lk.artify.backend.dto.ArtworkHomeDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,6 @@ public class ArtworkController {
     private ArtWorkImageService artWorkImageService;
 
     @PostMapping(consumes = {"multipart/form-data"})
-
     public ResponseEntity<?> createArtwork(
         @RequestParam String artworkName,
         @RequestParam String type,
@@ -83,7 +83,6 @@ public class ArtworkController {
                     .orElseThrow(() -> new IllegalArgumentException("Seller not found"));
             artWork.setSeller(seller);
 
-            
             ArtWork savedArtWork = artWorkRepository.save(artWork);
 
             List<ArtWorkImage> imageEntities = new ArrayList<>();
@@ -116,4 +115,41 @@ public class ArtworkController {
                 .collect(Collectors.toList());
     }
 
+    // New endpoint for home screen
+    @GetMapping("/home")
+    public ResponseEntity<List<ArtworkHomeDTO>> getArtworksForHome(
+            @RequestParam(required = false) Long auctionId) {
+        
+        // Get artworks that are not in any auction (auctionId is null)
+        List<ArtWork> artworks;
+        if (auctionId != null) {
+            artworks = artWorkRepository.findByAuctionId(auctionId);
+        } else {
+            artworks = artWorkRepository.findByAuctionIsNull();
+        }
+
+        // Convert to DTOs with image data
+        List<ArtworkHomeDTO> result = artworks.stream()
+                .map(artwork -> {
+                    ArtworkHomeDTO dto = new ArtworkHomeDTO();
+                    dto.setId(artwork.getId());
+                    dto.setArtworkName(artwork.getArtworkName());
+                    dto.setArtist(artwork.getArtist());
+                    dto.setType(artwork.getType());
+                    dto.setPrice(artwork.getPrice());
+                    dto.setSellingStatus(artwork.getSellingStatus());
+                    
+                    // Get first image if available
+                    if (!artwork.getImages().isEmpty()) {
+                        ArtWorkImage firstImage = artwork.getImages().get(0);
+                        dto.setImageId(firstImage.getId());
+                        dto.setImageContentType(firstImage.getContentType());
+                    }
+                    
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(result);
+    }
 }

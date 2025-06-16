@@ -11,4 +11,6 @@ import java.util.List;
 @Repository
 public interface ArtWorkRepository extends JpaRepository<ArtWork, Long> {
     List<ArtworkBasicInfoDTO> findBySeller_sellerIdAndSellingStatus(Long sellerId, SellingStatus sellingStatus);
+    List<ArtWork> findByAuctionIsNull();
+    List<ArtWork> findByAuctionId(Long auctionId);
 }

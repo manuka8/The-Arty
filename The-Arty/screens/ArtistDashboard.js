@@ -382,7 +382,7 @@ const ArtistDashboard = () => {
         </TouchableOpacity>
         <TouchableOpacity 
           style={styles.actionButton}
-          onPress={() => navigation.navigate('UserProfile')}
+          onPress={() => navigation.navigate('HomeSreen')}
         >
           <Text style={styles.buttonText}>Go to User Profile</Text>
         </TouchableOpacity>

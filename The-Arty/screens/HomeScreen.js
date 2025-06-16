@@ -18,53 +18,6 @@ import AntDesign from "@expo/vector-icons/AntDesign";
 const { width, height } = Dimensions.get("window");
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const ARTWORK_DATA = [
-  {
-    id: "1",
-    title: "Abstract Harmony",
-    artist: "Maria Chen",
-    price: "$1,200",
-    isAuction: true,
-    currentBid: "$850",
-    image: require("../assets/art1.jpg"),
-    timeLeft: "2d 4h",
-    likes: 142,
-    category: "Abstract",
-  },
-  {
-    id: "2",
-    title: "Urban Dreams",
-    artist: "James Wilson",
-    price: "$950",
-    isAuction: false,
-    image: require("../assets/art2.jpg"),
-    likes: 89,
-    category: "Photography",
-  },
-  {
-    id: "3",
-    title: "Oceanic Memories",
-    artist: "Sophia Lee",
-    price: "$2,300",
-    isAuction: true,
-    currentBid: "$1,750",
-    image: require("../assets/art3.jpg"),
-    timeLeft: "1d 12h",
-    likes: 256,
-    category: "Painting",
-  },
-  {
-    id: "4",
-    title: "Desert Bloom",
-    artist: "Ahmed Khan",
-    price: "$1,800",
-    isAuction: false,
-    image: require("../assets/art4.jpg"),
-    likes: 178,
-    category: "Digital",
-  },
-];
-
 const CATEGORIES = [
   { id: "1", name: "Paintings", icon: "color-palette", color: "#FF6B6B" },
   { id: "2", name: "Photography", icon: "camera", color: "#4ECDC4" },
@@ -106,6 +59,8 @@ const HomeScreen = ({ navigation }) => {
   const [profilePic, setProfilePic] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("1");
   const [likedItems, setLikedItems] = useState(new Set());
+  const [artworks, setArtworks] = useState([]);
+  const [loading, setLoading] = useState(true);
   
   const scrollY = useRef(new Animated.Value(0)).current;
   const searchAnimation = useRef(new Animated.Value(0)).current;
@@ -125,7 +80,31 @@ const HomeScreen = ({ navigation }) => {
         }
       }
     };
+    
+    const fetchArtworks = async () => {
+      try {
+        const response = await fetch('http://192.168.8.108:8080/api/artworks/home?auctionId=null');
+        const data = await response.json();
+        // Fetch images for each artwork
+        const artworksWithImages = await Promise.all(data.map(async artwork => {
+          if (artwork.images && artwork.images.length > 0) {
+            const imageResponse = await fetch(`http://192.168.8.108:8080/api/artworks/${artwork.id}/images/${artwork.images[0].id}`);
+            const imageBlob = await imageResponse.blob();
+            const imageUrl = URL.createObjectURL(imageBlob);
+            return { ...artwork, imageUrl };
+          }
+          return artwork;
+        }));
+        setArtworks(artworksWithImages);
+      } catch (error) {
+        console.error("Error fetching artworks:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     fetchProfile();
+    fetchArtworks();
   }, []);
 
   const toggleSearch = () => {
@@ -173,7 +152,13 @@ const HomeScreen = ({ navigation }) => {
         activeOpacity={0.9}
       >
         <View style={styles.imageContainer}>
-          <Image source={item.image} style={styles.artworkImage} />
+          {item.imageUrl ? (
+            <Image source={{ uri: item.imageUrl }} style={styles.artworkImage} />
+          ) : (
+            <View style={[styles.artworkImage, styles.placeholderImage]}>
+              <Ionicons name="image-outline" size={40} color="#999" />
+            </View>
+          )}
           <View style={styles.imageOverlay} />
           <TouchableOpacity
             style={styles.likeButton}
@@ -185,31 +170,20 @@ const HomeScreen = ({ navigation }) => {
               color={likedItems.has(item.id) ? "#FF6B6B" : "#fff"}
             />
           </TouchableOpacity>
-          {item.isAuction && (
+          {item.sellingStatus === 'PENDING_AUCTION' && (
             <View style={styles.auctionBadge}>
-              <Text style={styles.auctionBadgeText}>LIVE</Text>
+              <Text style={styles.auctionBadgeText}>COMING SOON</Text>
             </View>
           )}
         </View>
         <View style={styles.artworkInfo}>
-          <Text style={styles.artworkTitle} numberOfLines={1}>{item.title}</Text>
+          <Text style={styles.artworkTitle} numberOfLines={1}>{item.artworkName}</Text>
           <Text style={styles.artworkArtist} numberOfLines={1}>by {item.artist}</Text>
           <View style={styles.artworkFooter}>
-            {item.isAuction ? (
-              <View style={styles.bidContainer}>
-                <Text style={styles.currentBidLabel}>Current Bid</Text>
-                <Text style={styles.currentBidAmount}>{item.currentBid}</Text>
-                <View style={styles.timeContainer}>
-                  <Ionicons name="time-outline" size={12} color="#FF6B6B" />
-                  <Text style={styles.timeText}>{item.timeLeft}</Text>
-                </View>
-              </View>
-            ) : (
-              <Text style={styles.priceText}>{item.price}</Text>
-            )}
+            <Text style={styles.priceText}>${item.price.toFixed(2)}</Text>
             <View style={styles.likesContainer}>
               <Ionicons name="heart-outline" size={14} color="#999" />
-              <Text style={styles.likesText}>{item.likes}</Text>
+              <Text style={styles.likesText}>{Math.floor(Math.random() * 100)}</Text>
             </View>
           </View>
         </View>
@@ -267,6 +241,15 @@ const HomeScreen = ({ navigation }) => {
       </TouchableOpacity>
     </TouchableOpacity>
   );
+
+  // Filter artworks by selected category
+  const filteredArtworks = artworks.filter(artwork => {
+    if (selectedCategory === "1") return artwork.type === "Painting";
+    if (selectedCategory === "2") return artwork.type === "Photography";
+    if (selectedCategory === "3") return artwork.type === "Digital";
+    if (selectedCategory === "4") return artwork.type === "Sculpture";
+    return true;
+  });
 
   return (
     <View style={styles.container}>
@@ -374,7 +357,7 @@ const HomeScreen = ({ navigation }) => {
           />
           <View style={styles.heroOverlay} />
           <View style={styles.heroContent}>
-            <Text style={styles.heroTitle}>Summer Art Auction</Text>
+            <Text style={styles.heroTitle}>Summer Art Collection</Text>
             <Text style={styles.heroSubtitle}>Exclusive pieces • Limited time</Text>
             <TouchableOpacity style={styles.heroButton}>
               <Text style={styles.heroButtonText}>Explore Now</Text>
@@ -409,38 +392,20 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.seeAllText}>See All</Text>
             </TouchableOpacity>
           </View>
-          <FlatList
-            data={ARTWORK_DATA}
-            renderItem={renderArtworkItem}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.artworksList}
-          />
-        </View>
-
-        {/* Live Auctions */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleContainer}>
-              <Text style={styles.sectionTitle}>Live Auctions</Text>
-              <View style={styles.liveBadge}>
-                <View style={styles.liveIndicator} />
-                <Text style={styles.liveBadgeText}>LIVE</Text>
-              </View>
-            </View>
-            <TouchableOpacity>
-              <Text style={styles.seeAllText}>See All</Text>
-            </TouchableOpacity>
-          </View>
-          <FlatList
-            data={ARTWORK_DATA.filter((item) => item.isAuction)}
-            renderItem={renderArtworkItem}
-            keyExtractor={(item) => item.id}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.artworksList}
-          />
+          {loading ? (
+            <Text style={styles.loadingText}>Loading artworks...</Text>
+          ) : filteredArtworks.length > 0 ? (
+            <FlatList
+              data={filteredArtworks}
+              renderItem={renderArtworkItem}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.artworksList}
+            />
+          ) : (
+            <Text style={styles.noArtworksText}>No artworks found in this category</Text>
+          )}
         </View>
 
         {/* Trending Artists */}
@@ -654,27 +619,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#333",
   },
-  liveBadge: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#FF6B6B",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    marginLeft: 12,
-  },
-  liveIndicator: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: "#fff",
-    marginRight: 4,
-  },
-  liveBadgeText: {
-    color: "#fff",
-    fontSize: 10,
-    fontWeight: "bold",
-  },
   seeAllText: {
     color: "#6200ee",
     fontSize: 16,
@@ -735,6 +679,11 @@ const styles = StyleSheet.create({
     height: 200,
     resizeMode: "cover",
   },
+  placeholderImage: {
+    backgroundColor: "#f8f9fa",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   imageOverlay: {
     position: "absolute",
     left: 0,
@@ -787,30 +736,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
-  },
-  bidContainer: {
-    flex: 1,
-  },
-  currentBidLabel: {
-    fontSize: 12,
-    color: "#999",
-    marginBottom: 2,
-  },
-  currentBidAmount: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#FF6B6B",
-    marginBottom: 4,
-  },
-  timeContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  timeText: {
-    fontSize: 12,
-    color: "#FF6B6B",
-    marginLeft: 4,
-    fontWeight: "500",
   },
   priceText: {
     fontSize: 20,
@@ -885,6 +810,17 @@ const styles = StyleSheet.create({
   },
   bottomSpacing: {
     height: 40,
+  },
+  loadingText: {
+    textAlign: "center",
+    marginVertical: 20,
+    color: "#666",
+  },
+  noArtworksText: {
+    textAlign: "center",
+    marginVertical: 20,
+    color: "#666",
+    fontStyle: "italic",
   },
 });
 
