@@ -11,6 +11,7 @@ import SellerRegistrationScreen from '../screens/SellerRegistrationScreen';
 import ArtistDashboard from '../screens/ArtistDashboard';
 import AddArtwork from '../screens/AddArtwork';
 import AddAuction from '../screens/AddAuction';
+import ProductScreen from '../screens/ProductScreen';
 /*import ArtDetailScreen from '../screens/ArtDetailScreen';
 import AuctionScreen from '../screens/AuctionScreen';
 import ArtistProfileScreen from '../screens/ArtistProfileScreen';
@@ -69,6 +70,11 @@ const AppNavigator = () => {
         <Stack.Screen 
           name="AddAuction" 
           component={AddAuction} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="ProductScreen" 
+          component={ProductScreen} 
           options={{ headerShown: false }} 
         />
         {/* <Stack.Screen 
