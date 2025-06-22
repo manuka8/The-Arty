@@ -22,12 +22,7 @@ public class ArtWork {
     @Column(precision = 10, scale = 2)
     private BigDecimal price; 
 
-    private boolean copyAvailability;
 
-    @Enumerated(EnumType.STRING)
-    private ArtCopyType artCopyType; 
-    
-    private Integer noOfCopies;
     
     @Column(precision = 10, scale = 2)
     private BigDecimal price_of_copy;
@@ -43,7 +38,7 @@ public class ArtWork {
 
     private LocalDate addedDate;
 
-    private Integer minimumQuantityPerBuyer; 
+    private Integer availablecopies; 
 
     private boolean approved;
     
@@ -67,13 +62,9 @@ public class ArtWork {
 
     @Column(precision = 10, scale = 2)
     private BigDecimal currentBid;
+    
 
-
-    public enum ArtCopyType {
-        ORIGINAL_ART,
-        COPY_OF_ART,
-        VIRTUAL_COPY
-    }
+    
     
     public enum SellingStatus{
     	AVAILABLE,
@@ -141,14 +132,7 @@ public class ArtWork {
         this.price = price;
     }
 
-    public ArtCopyType getArtCopyType() {
-        return artCopyType;
-    }
-
-    public void setArtCopyType(ArtCopyType artCopyType) {
-        this.artCopyType = artCopyType;
-    }
-
+   
     public boolean isAvailability() {
         return availability;
     }
@@ -165,13 +149,7 @@ public class ArtWork {
         this.addedDate = addedDate;
     }
 
-    public Integer getMinimumQuantityPerBuyer() {
-        return minimumQuantityPerBuyer;
-    }
-
-    public void setMinimumQuantityPerBuyer(Integer minimumQuantityPerBuyer) {
-        this.minimumQuantityPerBuyer = minimumQuantityPerBuyer;
-    }
+    
 
     public boolean isApproved() {
         return approved;
@@ -181,21 +159,7 @@ public class ArtWork {
         this.approved = approved;
     }
 
-	public boolean isCopyAvailability() {
-		return copyAvailability;
-	}
-
-	public void setCopyAvailability(boolean copyAvailability) {
-		this.copyAvailability = copyAvailability;
-	}
-
-	public Integer getNoOfCopies() {
-		return noOfCopies;
-	}
-
-	public void setNoOfCopies(Integer noOfCopies) {
-		this.noOfCopies = noOfCopies;
-	}
+	
 
 	public BigDecimal getPrice_of_copy() {
 		return price_of_copy;
@@ -249,6 +213,28 @@ public class ArtWork {
 	    return images;
 	}
 
+	public Integer getAvailablecopies() {
+		return availablecopies;
+	}
+
+	
+
+	public BigDecimal getCurrentBid() {
+		return currentBid;
+	}
+
+	public void setCurrentBid(BigDecimal currentBid) {
+		this.currentBid = currentBid;
+	}
+
+	public Auction getAuction() {
+		return auction;
+	}
+
+	public BigDecimal getMinimumBid() {
+		return minimumBid;
+	}
+
 	public void setImages(List<ArtWorkImage> images) {
 	    this.images = images;
 	}
@@ -268,6 +254,16 @@ public class ArtWork {
 	public void setSeller(Seller seller) {
 		this.seller = seller;
 	}
-	
-	
+	public void setAuction(Auction auction) {
+        this.auction = auction;
+    }
+	public void setMinimumBid(BigDecimal minimumBid) {
+	    this.minimumBid = minimumBid;
+	}
+
+	public void setAvailablecopies(Integer minimumQuantityPerBuyer) {
+		this.availablecopies = availablecopies;
+		
+	}
+
 }
