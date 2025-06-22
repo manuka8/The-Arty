@@ -29,7 +29,7 @@ public class WebSecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**", "/api/users/**", "/api/sellers/**", "/api/artworks/**").permitAll()
+                .requestMatchers("/api/auth/**", "/api/users/**", "/api/sellers/**", "/api/artworks/**","/api/auctions").permitAll()
                 .anyRequest().authenticated()
             );
 
